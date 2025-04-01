@@ -1,5 +1,5 @@
 // Initialisation de la carte Leaflet
-let map = L.map("map").setView([45.75, 4.85], 9);
+let map = L.map("map").setView([46.6, 2.5], 7);
 
 // Ajout d'un fond de carte OpenStreetMap
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -67,9 +67,9 @@ async function fetchWeather(lat, lng, city) {
           <!-- INFO SPEC. JOURN -->
           <div id="footer_card" class="card-body pt-0">
               <hr>
-              <p class="card-text">Pressure : <span style="font-weight:bold;"> ${pressure}</span></p>
-              <p class="card-text">Humidité : <span style="font-weight:bold;"> ${humidity} g/m3</span></p>
-              <p class="card-text">Direction/vitesse vent : <span style="font-weight:bold;"> ${wind}</span></p>
+              <p class="card-text">Pressure : <span style="font-weight:700;"> ${pressure} hPa</span></p>
+              <p class="card-text">Humidité : <span style="font-weight:700;"> ${humidity} %</span></p>
+              <p class="card-text">Speed/Direction vent : <span style="font-weight:700;"> ${wind}</span></p>
           </div>
       </div>
     `;
@@ -115,6 +115,8 @@ async function fetchCity(e) {
 
     let marker = L.marker(e.latlng).addTo(markerGroup);
     marker.bindPopup(popupContent).openPopup();
+
+
   } catch (error) {
     console.error("Problème sur la requête ville :", error);
   }
@@ -126,3 +128,4 @@ map.on("click", function (e) {
   console.log("Latitude:", e.latlng.lat, "Longitude:", e.latlng.lng);
   fetchCity(e);
 });
+
