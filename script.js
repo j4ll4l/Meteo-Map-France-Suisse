@@ -10,10 +10,12 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 //Creation de un gruope de Markers pour pouvoir les gérer
 let markerGroup = L.layerGroup().addTo(map);
 
+const iconToggleTheme = document.querySelector("i.bi");
+
 /**
- * Fonction permettant de récupérer les informations météorologiques 
+ * Fonction permettant de récupérer les informations météorologiques
  * pour une localisation donnée (latitude, longitude) ou une ville.
- * 
+ *
  * @param {number} lat - Latitude de la position à récupérer.
  * @param {number} lng - Longitude de la position à récupérer.
  * @param {string} city - Nom de la ville détectée.
@@ -28,7 +30,6 @@ async function fetchWeather(lat, lng, city) {
     const dataMeteo = await meteoRequest.json();
     console.log("Données météo :", dataMeteo);
 
-
     //Recupere les informatoins et le stocker dans des variables
     const condition = dataMeteo.current_condition.condition;
     const temperature = dataMeteo.current_condition.tmp;
@@ -37,9 +38,8 @@ async function fetchWeather(lat, lng, city) {
     const pressure = dataMeteo.current_condition.pressure;
     const humidity = dataMeteo.current_condition.humidity;
     const wind = `${dataMeteo.current_condition.wnd_spd} / ${dataMeteo.current_condition.wnd_dir}`;
-    const city_name = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
-
-
+    const city_name =
+      city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
 
     // Contenu du popup
     const popupContent = `
@@ -75,19 +75,15 @@ async function fetchWeather(lat, lng, city) {
     `;
 
     return popupContent;
-
-
   } catch (error) {
     console.error("Problème sur la requête météo :", error);
   }
 }
 
-
-
 /**
  * Fonction permettant de récupérer le nom de la ville en fonction des coordonnées GPS
  * et d'afficher un marqueur avec les informations météorologiques.
- * 
+ *
  * @param {Object} e - Événement de clic sur la carte contenant les coordonnées (latitude et longitude).
  */
 async function fetchCity(e) {
@@ -115,13 +111,36 @@ async function fetchCity(e) {
 
     let marker = L.marker(e.latlng).addTo(markerGroup);
     marker.bindPopup(popupContent).openPopup();
-
-
   } catch (error) {
     console.error("Problème sur la requête ville :", error);
   }
 }
 
+/**
+ * @function toggleTheme
+ * Cette fonction permet de basculer dynamiquement entre le thème clair et le thème sombre
+ * de l'application.
+ * Elle est appelée lorsque l'utilisateur clique sur l'icône de changement de thème.
+ */
+function toggleTheme() {
+  const isDarkTheme = this.classList.contains("bi-sun-fill");
+  const popupWrapper = document.querySelector(".leaflet-popup-content-wrapper");
+  if (isDarkTheme) {
+    // Je change les themes
+    document.body.setAttribute("data-bs-theme", "light");
+    popupWrapper.style.backgroundColor = "#ffffff";
+    // document.body.dataset.bsTheme = "light"
+
+    // Je change l'icone soleil par lune
+    this.classList.replace("bi-sun-fill", "bi-moon-fill");
+  } else {
+    // Je change les themes
+    document.body.dataset.bsTheme = "dark";
+    popupWrapper.style.backgroundColor = "#212529";
+    // Je change l'icone lune par soleil
+    this.classList.replace("bi-moon-fill", "bi-sun-fill");
+  }
+}
 // Gestion du clic sur la carte
 map.on("click", function (e) {
   markerGroup.clearLayers();
@@ -129,3 +148,16 @@ map.on("click", function (e) {
   fetchCity(e);
 });
 
+// Je Change la theme de popup par rapport au theme de la page
+map.on("popupopen", function (e) {
+  const themeBody = document.body.getAttribute("data-bs-theme");
+  const popupWrapper = e.popup
+    .getElement()
+    .querySelector(".leaflet-popup-content-wrapper");
+  if (themeBody === "dark") {
+    popupWrapper.style.backgroundColor = "#212529";
+  } else {
+    popupWrapper.style.backgroundColor = "#ffffff";
+  }
+});
+iconToggleTheme.addEventListener("click", toggleTheme);
